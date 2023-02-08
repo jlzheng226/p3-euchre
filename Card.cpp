@@ -159,3 +159,113 @@ bool operator==(const Card& lhs, const Card& rhs) {
 bool operator!=(const Card& lhs, const Card& rhs) {
     return !(lhs == rhs);
 }
+
+Card::Card() {
+    rank = TWO;
+    suit = SPADES;
+}
+
+Card::Card(Rank rank_in, Suit suit_in) {
+    rank = rank_in;
+    suit = suit_in;
+}
+
+Rank Card::get_rank() const {
+    return rank;
+}
+
+Suit Card::get_suit() const {
+    return suit;
+}
+
+Suit Card::get_suit(Suit trump) const {
+    if (suit - trump == 2 || trump - suit == 2) {
+        if (rank == 9) {
+            return trump;
+        }
+    }
+    return suit;
+}
+
+bool Card::is_face_or_ace() const {
+    if (rank == 9 || rank == 10 || rank == 11 || rank == 12) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+bool Card::is_right_bower(Suit trump) const {
+    if (suit == trump) {
+        if (rank == 9) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Card::is_left_bower(Suit trump) const {
+    if (suit - trump == 2 || trump - suit == 2) {
+        if (rank == 9) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Card::is_trump(Suit trump) const {
+    if (get_suit(trump) == trump) {
+        return true;
+    }
+    return false;
+}
+
+Suit Suit_next(Suit suit) {
+    for (int s = SPADES; s <= DIAMONDS; s++) {
+        if (s - suit == 2 || suit - s == 2) {
+            return static_cast<Suit>(s);
+        }
+    }
+}
+
+bool Card_less(const Card& a, const Card& b, Suit trump) {
+    if (a.get_suit(trump) == trump && b.get_suit(trump) == trump) {
+        //both cards are bowers
+        if (a.get_rank() == 9 && b.get_rank() == 9) {
+            //when a is the right-bower and b is the left-bower
+            if (a.get_suit() == trump) {
+                return false;
+            }
+            //a is the left-bower and b is the right-bower
+            else {
+                return true;
+            }
+        }
+        //a is left or right bower, and b is other trump card
+        else if (a.get_rank() == 9) {
+            return false;
+        }
+        //b is left or right bower, and a is other trump card
+        else if (b.get_rank() == 9) {
+            return true;
+        }
+        //both cards are trump cards but not bowers
+        else {
+            return (a < b);
+        }
+    }
+    //a is trump but not b
+    else if (a.get_suit(trump) == trump) {
+        return false;
+    }
+    //b is trump but not a
+    else if (b.get_suit(trump) == trump) {
+        return true;
+    }
+    //both are not trump cards
+    else {
+        return (a < b);
+    }
+   
+}
