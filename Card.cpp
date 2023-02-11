@@ -41,11 +41,13 @@ std::ostream & operator<<(std::ostream &os, Rank rank) {
   return os;
 }
 
+//REQUIRES If any input is read, it must be a valid rank
 //EFFECTS Reads a Rank from a stream, for example "Two" -> TWO
 std::istream & operator>>(std::istream &is, Rank &rank) {
   string str;
-  is >> str;
-  rank = string_to_rank(str);
+  if(is >> str) {
+    rank = string_to_rank(str);
+  }
   return is;
 }
 
@@ -76,21 +78,19 @@ std::ostream & operator<<(std::ostream &os, Suit suit) {
   return os;
 }
 
+//REQUIRES If any input is read, it must be a valid suit
 //EFFECTS Reads a Suit from a stream, for example "Spades" -> SPADES
 std::istream & operator>>(std::istream &is, Suit &suit) {
   string str;
-  is >> str;
-  suit = string_to_suit(str);
+  if (is >> str) {
+    suit = string_to_suit(str);
+  }
   return is;
 }
 
 
 /////////////// Write your implementation for Card below ///////////////
 
-
-// NOTE: We HIGHLY recommend you check out the operator overloading
-// tutorial in the project spec before implementing
-// the following operator overload functions:
 std::ostream& operator<<(std::ostream& os, const Card& card) {
     Rank card_rank = card.get_rank();
     Suit card_suit = card.get_suit();
@@ -132,7 +132,7 @@ bool operator<(const Card& lhs, const Card& rhs) {
 }
 
 bool operator<=(const Card& lhs, const Card& rhs) {
-    return ((lhs< rhs) || (lhs == rhs));
+    return ((lhs < rhs) || (lhs == rhs));
 }
 
 bool operator>(const Card& lhs, const Card& rhs) {
@@ -179,16 +179,16 @@ Suit Card::get_suit() const {
 }
 
 Suit Card::get_suit(Suit trump) const {
-    if (suit - trump == 2 || trump - suit == 2) {
-        if (rank == 9) {
-            return trump;
-        }
+    if (is_left_bower(trump) || suit == trump) {
+        return trump;
     }
-    return suit;
+    else {
+        return suit;
+    }
 }
 
 bool Card::is_face_or_ace() const {
-    if (rank == 9 || rank == 10 || rank == 11 || rank == 12) {
+    if (rank == JACK || rank == QUEEN || rank == KING || rank == ACE) {
         return true;
     }
     else {
@@ -197,62 +197,66 @@ bool Card::is_face_or_ace() const {
 }
 
 bool Card::is_right_bower(Suit trump) const {
-    if (suit == trump) {
-        if (rank == 9) {
-            return true;
-        }
+    if (suit == trump && rank == JACK) {
+        return true;
     }
-    return false;
+    else {
+        return false;
+    }
 }
 
 bool Card::is_left_bower(Suit trump) const {
-    if (suit - trump == 2 || trump - suit == 2) {
-        if (rank == 9) {
-            return true;
-        }
+    if (abs(suit - trump) == 2 && rank == 9) {
+        return true;
     }
-    return false;
+    else {
+        return false;
+    }
 }
 
 bool Card::is_trump(Suit trump) const {
-    if (get_suit(trump) == trump) {
+    if (get_suit(suit) == trump) {
         return true;
     }
-    return false;
+    else {
+        return false;
+    }
 }
 
 Suit Suit_next(Suit suit) {
+    Suit next_suit;
     for (int s = SPADES; s <= DIAMONDS; s++) {
         if (s - suit == 2 || suit - s == 2) {
-            return static_cast<Suit>(s);
+            next_suit = static_cast<Suit>(s);
         }
     }
+    return next_suit;
 }
 
 bool Card_less(const Card& a, const Card& b, Suit trump) {
     if (a.get_suit(trump) == trump && b.get_suit(trump) == trump) {
         //both cards are bowers
-        if (a.get_rank() == 9 && b.get_rank() == 9) {
-            //when a is the right-bower and b is the left-bower
-            if (a.get_suit() == trump) {
+        if (a.get_rank() == JACK && b.get_rank() == JACK) {
+            //when a is the right-bower, return false
+            if (a.is_right_bower(trump)) {
                 return false;
             }
-            //a is the left-bower and b is the right-bower
+            // when a is the left-bower, return true
             else {
                 return true;
             }
         }
         //a is left or right bower, and b is other trump card
-        else if (a.get_rank() == 9) {
+        else if (a.get_rank() == JACK) {
             return false;
         }
         //b is left or right bower, and a is other trump card
-        else if (b.get_rank() == 9) {
+        else if (b.get_rank() == JACK) {
             return true;
         }
         //both cards are trump cards but not bowers
         else {
-            return (a < b);
+            return a < b;
         }
     }
     //a is trump but not b
@@ -267,7 +271,6 @@ bool Card_less(const Card& a, const Card& b, Suit trump) {
     else {
         return (a < b);
     }
-   
 }
 
 bool Card_less(const Card& a, const Card& b, const Card& led_card, Suit trump) {
@@ -287,6 +290,7 @@ bool Card_less(const Card& a, const Card& b, const Card& led_card, Suit trump) {
                 return false;
             }
         }
+        // case of a being led
         else if (a.get_suit(trump) == led) {
             if (b.get_suit(trump) == trump) {
                 return true;
@@ -298,6 +302,7 @@ bool Card_less(const Card& a, const Card& b, const Card& led_card, Suit trump) {
                 return false;
             }
         }
+        // case of a being normal cards
         else {
             if (b.get_suit(trump) == trump || b.get_suit(trump) == led) {
                 return true;
@@ -306,6 +311,17 @@ bool Card_less(const Card& a, const Card& b, const Card& led_card, Suit trump) {
                 return (a < b);
             }
         }
-
     }
 }
+
+// NOTE: We HIGHLY recommend you check out the operator overloading
+// tutorial in the project spec before implementing
+// the following operator overload functions:
+//   operator<<
+//   operator>>
+//   operator<
+//   operator<=
+//   operator>
+//   operator>=
+//   operator==
+//   operator!=
