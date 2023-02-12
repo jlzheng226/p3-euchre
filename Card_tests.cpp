@@ -13,6 +13,97 @@ TEST(test_card_ctor) {
     ASSERT_EQUAL(HEARTS, c.get_suit());
 }
 
+TEST(test_ostream_operator) {
+    ostringstream os1;
+    ostringstream os2;
+    ostringstream os3;
+
+    Card jack_diamonds = Card(JACK, DIAMONDS);
+    Card nine_hearts = Card(NINE, HEARTS);
+    Card ace_clubs = Card(ACE, CLUBS);
+
+    os1 << jack_diamonds;
+    os2 << nine_hearts;
+    os3 << ace_clubs;
+
+    ASSERT_EQUAL(os1.str(), "Jack of Diamonds");
+    ASSERT_EQUAL(os2.str(), "Nine of Hearts");
+    ASSERT_EQUAL(os3.str(), "Ace of Clubs");
+}
+
+TEST(test_istream_operator) {
+    istringstream iss("Jack of Spades");
+    Card c;
+    iss >> c;
+    ASSERT_EQUAL(c, Card(JACK, SPADES));
+}
+
+TEST(test_operator_comparison) {
+    Card jack_diamonds = Card(JACK, DIAMONDS);
+    Card jack_hearts = Card(JACK, HEARTS);
+    Card nine_hearts = Card(NINE, HEARTS);
+
+    ASSERT_TRUE(jack_hearts < jack_diamonds);
+    ASSERT_TRUE(jack_hearts <= jack_diamonds);
+    ASSERT_TRUE(jack_diamonds > jack_hearts);
+    ASSERT_TRUE(jack_diamonds >= jack_hearts);
+    ASSERT_TRUE(nine_hearts < jack_diamonds);
+    ASSERT_TRUE(jack_diamonds == jack_diamonds);
+    ASSERT_TRUE(jack_hearts != jack_diamonds);
+}
+
+TEST(test_get_suit_trump) {
+    // test trump card
+    Card jack_diamonds = Card(JACK, DIAMONDS);
+    Card jack_hearts = Card(JACK, HEARTS);
+    Card nine_hearts = Card(NINE, HEARTS);
+    Suit trump = HEARTS;
+    ASSERT_EQUAL(jack_diamonds.get_suit(trump), trump);
+    ASSERT_EQUAL(jack_hearts.get_suit(trump), trump);
+    ASSERT_EQUAL(nine_hearts.get_suit(trump), trump);
+
+    // test normal card
+    Card ace_diamonds = Card(ACE, DIAMONDS);
+    ASSERT_EQUAL(ace_diamonds.get_suit(trump), DIAMONDS);
+}
+
+TEST(test_is_face_or_ace) {
+    Card nine_hearts = Card(NINE, HEARTS);
+    Card jack_hearts = Card(JACK, HEARTS);
+    Card queen_hearts = Card(JACK, HEARTS);
+    Card king_hearts = Card(JACK, HEARTS);
+    Card ace_hearts = Card(JACK, HEARTS);
+
+    ASSERT_FALSE(nine_hearts.is_face_or_ace());
+    ASSERT_TRUE(jack_hearts.is_face_or_ace());
+    ASSERT_TRUE(queen_hearts.is_face_or_ace());
+    ASSERT_TRUE(king_hearts.is_face_or_ace());
+    ASSERT_TRUE(ace_hearts.is_face_or_ace());
+}
+
+TEST(test_is_left_or_right_bower) {
+    Card jack_diamonds = Card(JACK, DIAMONDS);
+    Card jack_hearts = Card(JACK, HEARTS);
+    Suit trump = HEARTS;
+    ASSERT_TRUE(jack_diamonds.is_left_bower(trump));
+    ASSERT_TRUE(jack_hearts.is_right_bower(trump));
+}
+
+TEST(test_is_trump) {
+    Card jack_diamonds = Card(JACK, DIAMONDS);
+    Card jack_hearts = Card(JACK, HEARTS);
+    Suit trump = HEARTS;
+    ASSERT_TRUE(jack_diamonds.is_trump(trump));
+    ASSERT_TRUE(jack_hearts.is_trump(trump));
+}
+
+TEST(test_suit_next) {
+    ASSERT_EQUAL(Suit_next(CLUBS), SPADES);
+    ASSERT_EQUAL(Suit_next(SPADES), CLUBS);
+    ASSERT_EQUAL(Suit_next(HEARTS), DIAMONDS);
+    ASSERT_EQUAL(Suit_next(DIAMONDS), HEARTS);
+}
+
 TEST(test_right_bowel_value) {
     Suit trump_suit = HEARTS;
     Card led_card = Card(KING, CLUBS);

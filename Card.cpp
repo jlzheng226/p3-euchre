@@ -215,7 +215,7 @@ bool Card::is_left_bower(Suit trump) const {
 }
 
 bool Card::is_trump(Suit trump) const {
-    if (get_suit(suit) == trump) {
+    if (get_suit(trump) == trump) {
         return true;
     }
     else {
