@@ -79,10 +79,11 @@ public:
 
     virtual void add_and_discard(const Card& upcard) override {
         add_card(upcard);
+        Suit trump = upcard.get_suit();
         Card lowest = handCard[0];
         int lowest_index = 0;
         for (auto card : handCard) {
-            if (card < lowest) {
+            if (Card_less(card, lowest, trump)) {
                 lowest = card;
                 // track the index of the lowest card
                 lowest_index++;
@@ -184,23 +185,25 @@ public:
         handCard.push_back(c);
     }
 
-  /*  virtual bool make_trump(const Card& upcard, bool is_dealer,
+   virtual bool make_trump(const Card& upcard, bool is_dealer,
         int round, Suit& order_up_suit) const override {
-        assert(false);
+       return false;
     }
 
     virtual void add_and_discard(const Card& upcard) override {
-        assert(false);
+        return;
     }
 
     virtual Card lead_card(Suit trump) override {
-        assert(false);
+        Card c;
+        return c;
     }
 
     virtual Card play_card(const Card& led_card, Suit trump) override {
-        assert(false);
+        Card d;
+        return d;
     }
-*/
+
 private:
     string name;
     vector<Card>handCard;
@@ -214,9 +217,9 @@ Player* Player_factory(const std::string& name,
         // The "new" keyword dynamically allocates an object.
         return new SimplePlayer(name);
     }
-    /*else if (strategy == "Human") {
+    else if (strategy == "Human") {
         return new HumanPlayer(name);
-    }*/
+    }
 
     // Invalid strategy if we get here
     return nullptr;
