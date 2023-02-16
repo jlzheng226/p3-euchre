@@ -2,10 +2,9 @@
 
 #include "Player.h"
 #include "Card.h"
-#include <sstream>
 #include "unit_test_framework.h"
 
-#include <iostream>
+
 
 using namespace std;
 
@@ -30,35 +29,41 @@ TEST(test_player_make_trump){
     const Card ace_hearts = Card(ACE, HEARTS);
     const Card nine_clubs = Card(NINE, CLUBS);
     const Card upcard = Card(TEN, DIAMONDS);
-    Suit order_up;
+    Suit order_up_a = SPADES;
+    Suit order_up_b = SPADES;
+    Suit order_up_d = SPADES;
+
     (*alice).add_card(nine_diamonds);
     (*alice).add_card(king_diamonds);
     (*alice).add_card(jack_hearts);
     (*alice).add_card(ten_spades);
     (*alice).add_card(ace_hearts);
+
     (*bob).add_card(nine_diamonds);
     (*bob).add_card(king_diamonds);
     (*bob).add_card(ace_hearts);
     (*bob).add_card(ten_spades);
+
     (*Dan).add_card(nine_diamonds);
     (*Dan).add_card(king_diamonds);
     (*Dan).add_card(ten_spades);
     (*Dan).add_card(nine_clubs);
-    bool make_trump_1 = (*alice).make_trump(upcard, false, round_one, order_up);
+
+    bool make_trump_1 = (*alice).make_trump(upcard, false, round_one, order_up_a);
     ASSERT_EQUAL(make_trump_1, true);
-    ASSERT_EQUAL(order_up, DIAMONDS);
-    bool make_trump_2 = (*alice).make_trump(upcard, true, round_one, order_up);
+    ASSERT_EQUAL(order_up_a, DIAMONDS);
+    bool make_trump_2 = (*alice).make_trump(upcard, true, round_one, order_up_a);
     ASSERT_EQUAL(make_trump_2, true);
-    ASSERT_EQUAL(order_up, DIAMONDS);
-    bool make_trump_3 = (*bob).make_trump(upcard, false, round_one, order_up);
+    ASSERT_EQUAL(order_up_a, DIAMONDS);
+    bool make_trump_3 = (*bob).make_trump(upcard, false, round_one, order_up_b);
     ASSERT_EQUAL(make_trump_3, false);
-    ASSERT_EQUAL(order_up, SPADES);
-    bool make_trump_4 = (*bob).make_trump(upcard, false, round_two, order_up);
+    ASSERT_EQUAL(order_up_b, SPADES);//
+    bool make_trump_4 = (*bob).make_trump(upcard, false, round_two, order_up_b);
     ASSERT_EQUAL(make_trump_4, true);
-    ASSERT_EQUAL(order_up, HEARTS);
-    bool make_trump_5 = (*Dan).make_trump(upcard, true, round_two, order_up);
+    ASSERT_EQUAL(order_up_b, HEARTS);
+    bool make_trump_5 = (*Dan).make_trump(upcard, true, round_two, order_up_d);
     ASSERT_EQUAL(make_trump_5, true);
-    ASSERT_EQUAL(order_up, HEARTS);
+    ASSERT_EQUAL(order_up_d, HEARTS);
     delete alice;
     delete bob;
     delete Dan;
@@ -85,11 +90,17 @@ TEST(add_and_discard_lead_card){
     (*alice).add_card(ten_spades);
     (*alice).add_card(ace_hearts);
     (*alice).add_and_discard(upcard_a);
-    ASSERT_EQUAL((*alice).lead_card(trump), ace_hearts);
-    ASSERT_EQUAL((*alice).lead_card(trump), jack_hearts);
-    ASSERT_EQUAL((*alice).lead_card(trump), king_diamonds);
-    ASSERT_EQUAL((*alice).lead_card(trump), upcard_a);
-    ASSERT_EQUAL((*alice).lead_card(trump), nine_diamonds);
+
+    Card lead_card_a = (*alice).lead_card(trump);
+    ASSERT_EQUAL(lead_card_a, ace_hearts);
+    lead_card_a = (*alice).lead_card(trump);
+    ASSERT_EQUAL(lead_card_a, jack_hearts);
+    lead_card_a = (*alice).lead_card(trump);
+    ASSERT_EQUAL(lead_card_a, king_diamonds);
+    lead_card_a = (*alice).lead_card(trump);
+    ASSERT_EQUAL(lead_card_a, upcard_a);
+    lead_card_a = (*alice).lead_card(trump);
+    ASSERT_EQUAL(lead_card_a, nine_diamonds);
     delete alice;
 
     (*bob).add_card(ten_diamonds);
@@ -98,11 +109,17 @@ TEST(add_and_discard_lead_card){
     (*bob).add_card(queen_diamonds);
     (*bob).add_card(nine_diamonds);
     (*bob).add_and_discard(upcard_b);
-    ASSERT_EQUAL((*bob).lead_card(trump), jack_hearts);
-    ASSERT_EQUAL((*bob).lead_card(trump), upcard_b);
-    ASSERT_EQUAL((*bob).lead_card(trump), king_diamonds);
-    ASSERT_EQUAL((*bob).lead_card(trump), queen_diamonds);
-    ASSERT_EQUAL((*bob).lead_card(trump), ten_diamonds);
+
+    Card lead_card_b = (*bob).lead_card(trump);
+    ASSERT_EQUAL(lead_card_b, jack_hearts);
+    lead_card_b = (*bob).lead_card(trump);
+    ASSERT_EQUAL(lead_card_b, upcard_b);
+    lead_card_b = (*bob).lead_card(trump);
+    ASSERT_EQUAL(lead_card_b, king_diamonds);
+    lead_card_b = (*bob).lead_card(trump);
+    ASSERT_EQUAL(lead_card_b, queen_diamonds);
+    lead_card_b = (*bob).lead_card(trump);
+    ASSERT_EQUAL(lead_card_b, ten_diamonds);
     delete bob;
 }
 
@@ -145,15 +162,17 @@ TEST(play_cards){
 
     play_card = (*bob).play_card(led_card_b, trump);
     ASSERT_EQUAL(play_card, ten_spades);
+    play_card = (*bob).play_card(led_card_b, trump);
     ASSERT_EQUAL(play_card, king_clubs);
+    play_card = (*bob).play_card(led_card_b, trump);
     ASSERT_EQUAL(play_card, nine_diamonds);
+    play_card = (*bob).play_card(led_card_b, trump);
     ASSERT_EQUAL(play_card, king_diamonds);
+    play_card = (*bob).play_card(led_card_b, trump);
     ASSERT_EQUAL(play_card, jack_hearts);
     delete bob;
     
 }
-
-
 
 
 TEST_MAIN()
