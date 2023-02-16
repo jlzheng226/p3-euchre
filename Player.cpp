@@ -95,36 +95,39 @@ public:
     virtual Card lead_card(Suit trump) override {
         Card largestCard = handCard[0];
         int largest_index = 0;
-        bool allTrump = true;
-        for (auto card : handCard) {
+       
+        for (int card = 0; card < handCard.size(); card++) {
             // When a Simple Player leads a trick, 
             // they play the highest non-trump card in their hand.
-            if (card.is_trump(trump) == false && card > largestCard) {
-                // update the largest non-trump card
-                largestCard = card;
-                // track the index of the largest card
-                largest_index++;
-                // track if the player have cards other than trump cards
-                allTrump = false;
+            if (handCard[card].is_trump(trump) == false) {
+                largestCard = handCard[card];
+                largest_index = card;
+                for (int remaining_cards = card + 1; remaining_cards < handCard.size(); remaining_cards++) {
+                    if (handCard[remaining_cards].is_trump(trump) == false && handCard[remaining_cards] > largestCard) {
+                        largestCard = handCard[remaining_cards];
+                        largest_index = remaining_cards;
+                    }
+                }
+                handCard.erase(handCard.begin() + largest_index);
+                return largestCard;
             }
         }
         // If they have only trump cards, 
         // they play the highest trump card in their hand.
-        if (allTrump) {
-            largestCard = handCard[0];
-            largest_index = 0;
-            for (auto card : handCard) {
-                if (card > largestCard) {
-                    largestCard = card;
+        for (auto card : handCard) {
+            if (card > largestCard) {
+                largestCard = card;
                     // track the index of the largest card
-                    largest_index++;
                 }
+            largest_index++;
             }
-        }
+        
         // erase the card from the vector
         handCard.erase(handCard.begin() + largest_index);
         return largestCard;
     }
+    
+    
 
     virtual Card play_card(const Card& led_card, Suit trump) override {
         Suit ledSuit = led_card.get_suit(trump);
@@ -191,7 +194,7 @@ public:
     }
 
     virtual void add_and_discard(const Card& upcard) override {
-        return;
+        
     }
 
     virtual Card lead_card(Suit trump) override {
