@@ -49,18 +49,23 @@ TEST(test_player_make_trump){
     (*Dan).add_card(ten_spades);
     (*Dan).add_card(nine_clubs);
 
+    //Alice has two face-or-Ace trumps for the first round, one is left bower
     bool make_trump_1 = (*alice).make_trump(upcard, false, round_one, order_up_a);
     ASSERT_EQUAL(make_trump_1, true);
     ASSERT_EQUAL(order_up_a, DIAMONDS);
+    //whether Alice is dealer or not, she shall always make trump
     bool make_trump_2 = (*alice).make_trump(upcard, true, round_one, order_up_a);
     ASSERT_EQUAL(make_trump_2, true);
     ASSERT_EQUAL(order_up_a, DIAMONDS);
+    //Bob has only one face-or-Ace trump for first round, so return false, order up doesn't change
     bool make_trump_3 = (*bob).make_trump(upcard, false, round_one, order_up_b);
     ASSERT_EQUAL(make_trump_3, false);
-    ASSERT_EQUAL(order_up_b, SPADES);//
+    ASSERT_EQUAL(order_up_b, SPADES);
+    //for the second round, Bob has enough face-or-ace trump, so return true, order up changes
     bool make_trump_4 = (*bob).make_trump(upcard, false, round_two, order_up_b);
     ASSERT_EQUAL(make_trump_4, true);
     ASSERT_EQUAL(order_up_b, HEARTS);
+    //for the second round, Dan is dealer, and even if he does't have enough HEARTS, he has to accept the upcard
     bool make_trump_5 = (*Dan).make_trump(upcard, true, round_two, order_up_d);
     ASSERT_EQUAL(make_trump_5, true);
     ASSERT_EQUAL(order_up_d, HEARTS);
@@ -90,7 +95,9 @@ TEST(add_and_discard_lead_card){
     (*alice).add_card(ten_spades);
     (*alice).add_card(ace_hearts);
     (*alice).add_and_discard(upcard_a);
+    //after add and discard, Alice has four trumps and one non-trump
 
+    //she first lead the largest non-trump, then the largest trump...
     Card lead_card_a = (*alice).lead_card(trump);
     ASSERT_EQUAL(lead_card_a, ace_hearts);
     lead_card_a = (*alice).lead_card(trump);
@@ -109,7 +116,9 @@ TEST(add_and_discard_lead_card){
     (*bob).add_card(queen_diamonds);
     (*bob).add_card(nine_diamonds);
     (*bob).add_and_discard(upcard_b);
+    //Bob has five trumps before add and discard, so after it he still has five trumps
 
+    //starting from jack_hearts, he leads the largest trump
     Card lead_card_b = (*bob).lead_card(trump);
     ASSERT_EQUAL(lead_card_b, jack_hearts);
     lead_card_b = (*bob).lead_card(trump);
@@ -148,6 +157,7 @@ TEST(play_cards){
     (*bob).add_card(ten_spades);
     (*bob).add_card(king_clubs);
 
+    //led card is trump, so Alice plays the largest trump
     Card play_card = (*alice).play_card(led_card_a, trump);
     ASSERT_EQUAL(play_card, jack_hearts);
     play_card = (*alice).play_card(led_card_a, trump);
@@ -155,13 +165,16 @@ TEST(play_cards){
     play_card = (*alice).play_card(led_card_a, trump);
     ASSERT_EQUAL(play_card, nine_diamonds);
     play_card = (*alice).play_card(led_card_a, trump);
+    //she cannot follow suit now, so play the lowest card
     ASSERT_EQUAL(play_card, ten_spades);
     play_card = (*alice).play_card(led_card_a, trump);
     ASSERT_EQUAL(play_card, king_clubs);
     delete alice;
 
+    //follow the suit, whcih is spades
     play_card = (*bob).play_card(led_card_b, trump);
     ASSERT_EQUAL(play_card, ten_spades);
+    //does not have spades, so play the lowest card
     play_card = (*bob).play_card(led_card_b, trump);
     ASSERT_EQUAL(play_card, king_clubs);
     play_card = (*bob).play_card(led_card_b, trump);

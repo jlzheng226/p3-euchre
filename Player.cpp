@@ -82,11 +82,11 @@ public:
         Suit trump = upcard.get_suit();
         Card lowest = handCard[0];
         int lowest_index = 0;
-        for (auto card : handCard) {
-            if (Card_less(card, lowest, trump)) {
-                lowest = card;
+        for (int card = 1; card < handCard.size(); card++) {
+            if (Card_less(handCard[card], lowest, trump)) {
+                lowest = handCard[card];
                 // track the index of the lowest card
-                lowest_index++;
+                lowest_index = card;
             }
         }
         handCard.erase(handCard.begin() + lowest_index);
@@ -114,12 +114,12 @@ public:
         }
         // If they have only trump cards, 
         // they play the highest trump card in their hand.
-        for (auto card : handCard) {
-            if (card > largestCard) {
-                largestCard = card;
-                    // track the index of the largest card
+        for (int card = 1; card < handCard.size(); card++) {
+            if (Card_less(largestCard, handCard[card],trump)) {
+                largestCard = handCard[card];
+                largest_index = card;// track the index of the largest card
                 }
-            largest_index++;
+            
             }
         
         // erase the card from the vector
