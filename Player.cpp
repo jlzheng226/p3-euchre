@@ -19,11 +19,14 @@ public:
         return name;
     }
     virtual void add_card(const Card& c) override {
+        assert(handCard.size() <= MAX_HAND_SIZE);
         handCard.push_back(c);
     }
 
     virtual bool make_trump(const Card& upcard, bool is_dealer,
         int round, Suit& order_up_suit) const override {
+        assert(round == 1 || round == 2);
+        
         Suit upcard_suit = upcard.get_suit();
         // round 1
         if (round == 1) {
@@ -79,13 +82,14 @@ public:
 
     virtual void add_and_discard(const Card& upcard) override {
         add_card(upcard);
+        assert(handCard.size() >= 1);
         Suit trump = upcard.get_suit();
         Card lowest = handCard[0];
         int lowest_index = 0;
         for (int card = 1; card < handCard.size(); card++) {
             if (Card_less(handCard[card], lowest, trump)) {
                 lowest = handCard[card];
-                // track the index of the lowest card
+                // update the index of the lowest card
                 lowest_index = card;
             }
         }
@@ -93,75 +97,86 @@ public:
     }
 
     virtual Card lead_card(Suit trump) override {
+        assert(handCard.size() >= 1);
         Card largestCard = handCard[0];
         int largest_index = 0;
-       
-        for (int card = 0; card < handCard.size(); card++) {
+        for (int index = 0; index < handCard.size(); index++) {
             // When a Simple Player leads a trick, 
             // they play the highest non-trump card in their hand.
-            if (handCard[card].is_trump(trump) == false) {
-                largestCard = handCard[card];
-                largest_index = card;
-                for (int remaining_cards = card + 1; remaining_cards < handCard.size(); remaining_cards++) {
-                    if (handCard[remaining_cards].is_trump(trump) == false && handCard[remaining_cards] > largestCard) {
-                        largestCard = handCard[remaining_cards];
-                        largest_index = remaining_cards;
+            if (handCard[index].is_trump(trump) == false) {
+                largestCard = handCard[index];
+                largest_index = index;
+                for (int remain_index = index + 1; 
+                     remain_index < handCard.size(); 
+                     remain_index++) {
+                    if (handCard[remain_index] > largestCard) {
+                        // update the largest non-trump card
+                        largestCard = handCard[remain_index];
+                        // update the index of the largest card
+                        largest_index = remain_index;
                     }
                 }
+                // erase the card from the vector
                 handCard.erase(handCard.begin() + largest_index);
                 return largestCard;
             }
         }
         // If they have only trump cards, 
         // they play the highest trump card in their hand.
-        for (int card = 1; card < handCard.size(); card++) {
-            if (Card_less(largestCard, handCard[card],trump)) {
-                largestCard = handCard[card];
-                largest_index = card;// track the index of the largest card
-                }
-            
+        for (int index = 1; index < handCard.size(); index++) {
+            if (Card_less(largestCard, handCard[index], trump)) {
+                largestCard = handCard[index];
+                // track the index of the largest card
+                largest_index = index;
             }
-        
+        }
         // erase the card from the vector
         handCard.erase(handCard.begin() + largest_index);
         return largestCard;
     }
-    
-    
 
     virtual Card play_card(const Card& led_card, Suit trump) override {
+        assert(handCard.size() >= 1);
         Suit ledSuit = led_card.get_suit(trump);
         Card largestSuitCard = handCard[0];
         int largestSuit_index = 0;
-        bool noFollowSuit = true;
-        for (auto card : handCard) {
-            if (card.get_suit(trump) == ledSuit && card > largestSuitCard) {
-                // update largest follow suit
-                largestSuitCard = card;
-                // track the largest follow suit index
-                largestSuit_index++;
-                // track if the player can follow the suit
-                noFollowSuit = false;
-            }
+
+        // if a simple player can follow suit
+        // they play the highest card that follows suit
+        for (int index = 0; index < handCard.size(); index++) {
+            // first, find the first same suit card
+            if (handCard[index].get_suit(trump) == ledSuit) {
+                largestSuitCard = handCard[index];
+                largestSuit_index = index;
+                // find the highest card that follows suit
+                for (int remain_index = index + 1; 
+                     remain_index < handCard.size();
+                     remain_index++) {
+                    if (Card_less(largestSuitCard, handCard[remain_index], 
+                        led_card, trump)) {
+                        // update largest follow suit card
+                        largestSuitCard = handCard[remain_index];
+                        // update the largest follow suit index
+                        largestSuit_index = remain_index;
+                    }
+                }
+                handCard.erase(handCard.begin() + largestSuit_index);
+                return largestSuitCard;
+            } 
         }
+
         // if the player does not have cards that follow suit,
         // they play the lowest card in their hand
-        if (noFollowSuit) {
-            Card lowestCard = handCard[0];
-            int lowest_index = 0;
-            for (auto card : handCard) {
-                if (card < lowestCard) {
-                    lowestCard = card;
-                    lowest_index++;
-                }
+        Card lowestCard = handCard[0];
+        int lowest_index = 0;
+        for (int index = 1; index < handCard.size(); index++) {
+            if (Card_less(handCard[index], lowestCard, trump)) {
+                lowestCard = handCard[index];
+                lowest_index = index;
             }
-            handCard.erase(handCard.begin() + lowest_index);
-            return lowestCard;
         }
-        else {
-            handCard.erase(handCard.begin() + largestSuit_index);
-            return largestSuitCard;
-        }
+        handCard.erase(handCard.begin() + lowest_index);
+        return lowestCard;
     }
 
 
@@ -190,11 +205,11 @@ public:
 
    virtual bool make_trump(const Card& upcard, bool is_dealer,
         int round, Suit& order_up_suit) const override {
-       return false;
+        return false;
     }
 
     virtual void add_and_discard(const Card& upcard) override {
-        
+        return;
     }
 
     virtual Card lead_card(Suit trump) override {
