@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -81,8 +82,8 @@ public:
     }
 
     virtual void add_and_discard(const Card& upcard) override {
-        add_card(upcard);
         assert(handCard.size() >= 1);
+        add_card(upcard);
         Suit trump = upcard.get_suit();
         Card lowest = handCard[0];
         int lowest_index = 0;
@@ -200,31 +201,76 @@ public:
     }
 
     virtual void add_card(const Card& c) override {
+        assert(handCard.size() <= MAX_HAND_SIZE);
         handCard.push_back(c);
     }
 
-   virtual bool make_trump(const Card& upcard, bool is_dealer,
+    virtual bool make_trump(const Card& upcard, bool is_dealer,
         int round, Suit& order_up_suit) const override {
-        return false;
+        assert(round == 1 || round == 2);
+        // print the player's hand card
+        std::sort(handCard.begin(), handCard.end());
+        print_hand();
+        cout << "Human player " << name << ", please enter a suit, or \"pass\":\n";
+
+        // ask the human player for decision
+        string decision;
+        cin >> decision;
+        if (decision != "pass") {
+            Suit ordered_up = string_to_suit(decision);
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     virtual void add_and_discard(const Card& upcard) override {
-        return;
+        assert(handCard.size() >= 1);
+        add_card(upcard);
+        std::sort(handCard.begin(), handCard.end());
+        print_hand();
+        cout << "Discard upcard: [-1]\n";
+        cout << "Human player " << name << ", please select a card to discard:\n";
+
+        int decision;
+        cin >> decision;
+        handCard.erase(handCard.begin() + decision);
     }
 
     virtual Card lead_card(Suit trump) override {
-        Card c;
-        return c;
+        assert(handCard.size() >= 1);
+        std::sort(handCard.begin(), handCard.end());
+        print_hand();
+        cout << "Human player " << name << ", please select a card:\n";
+        int decision;
+        cin >> decision;
+
+        return handCard[decision];
     }
 
     virtual Card play_card(const Card& led_card, Suit trump) override {
-        Card d;
-        return d;
+        assert(handCard.size() >= 1);
+        std::sort(handCard.begin(), handCard.end());
+        print_hand();
+        cout << "Human player " << name << ", please select a card:\n";
+        int decision;
+        cin >> decision;
+
+        return handCard[decision];
     }
 
 private:
     string name;
     vector<Card>handCard;
+
+    void print_hand() const {
+        for (size_t i = 0; i < handCard.size(); ++i) {
+            cout << "Human player " << name << "'s hand: "
+            << "[" << i << "] " << handCard[i] << "\n";
+    }
+}
+
 };
 
 Player* Player_factory(const std::string& name,
