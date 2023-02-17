@@ -20,7 +20,7 @@ public:
         return name;
     }
     virtual void add_card(const Card& c) override {
-        assert(handCard.size() <= MAX_HAND_SIZE);
+        assert(static_cast<int>(handCard.size()) <= MAX_HAND_SIZE);
         handCard.push_back(c);
     }
 
@@ -82,12 +82,12 @@ public:
     }
 
     virtual void add_and_discard(const Card& upcard) override {
-        assert(handCard.size() >= 1);
+        assert(static_cast<int>(handCard.size()) >= 1);
         add_card(upcard);
         Suit trump = upcard.get_suit();
         Card lowest = handCard[0];
         int lowest_index = 0;
-        for (int card = 1; card < handCard.size(); card++) {
+        for (size_t card = 1; card < handCard.size(); card++) {
             if (Card_less(handCard[card], lowest, trump)) {
                 lowest = handCard[card];
                 // update the index of the lowest card
@@ -98,16 +98,16 @@ public:
     }
 
     virtual Card lead_card(Suit trump) override {
-        assert(handCard.size() >= 1);
+        assert(static_cast<int>(handCard.size()) >= 1);
         Card largestCard = handCard[0];
         int largest_index = 0;
-        for (int index = 0; index < handCard.size(); index++) {
+        for (size_t index = 0; index < handCard.size(); index++) {
             // When a Simple Player leads a trick, 
             // they play the highest non-trump card in their hand.
             if (handCard[index].is_trump(trump) == false) {
                 largestCard = handCard[index];
                 largest_index = index;
-                for (int remain_index = index + 1; 
+                for (size_t remain_index = index + 1; 
                      remain_index < handCard.size(); 
                      remain_index++) {
                     if (handCard[remain_index] > largestCard) {
@@ -124,7 +124,7 @@ public:
         }
         // If they have only trump cards, 
         // they play the highest trump card in their hand.
-        for (int index = 1; index < handCard.size(); index++) {
+        for (size_t index = 1; index < handCard.size(); index++) {
             if (Card_less(largestCard, handCard[index], trump)) {
                 largestCard = handCard[index];
                 // track the index of the largest card
@@ -137,20 +137,20 @@ public:
     }
 
     virtual Card play_card(const Card& led_card, Suit trump) override {
-        assert(handCard.size() >= 1);
+        assert(static_cast<int>(handCard.size()) >= 1);
         Suit ledSuit = led_card.get_suit(trump);
         Card largestSuitCard = handCard[0];
         int largestSuit_index = 0;
 
         // if a simple player can follow suit
         // they play the highest card that follows suit
-        for (int index = 0; index < handCard.size(); index++) {
+        for (size_t index = 0; index < handCard.size(); index++) {
             // first, find the first same suit card
             if (handCard[index].get_suit(trump) == ledSuit) {
                 largestSuitCard = handCard[index];
                 largestSuit_index = index;
                 // find the highest card that follows suit
-                for (int remain_index = index + 1; 
+                for (size_t remain_index = index + 1; 
                      remain_index < handCard.size();
                      remain_index++) {
                     if (Card_less(largestSuitCard, handCard[remain_index], 
@@ -170,7 +170,7 @@ public:
         // they play the lowest card in their hand
         Card lowestCard = handCard[0];
         int lowest_index = 0;
-        for (int index = 1; index < handCard.size(); index++) {
+        for (size_t index = 1; index < handCard.size(); index++) {
             if (Card_less(handCard[index], lowestCard, trump)) {
                 lowestCard = handCard[index];
                 lowest_index = index;
@@ -201,7 +201,7 @@ public:
     }
 
     virtual void add_card(const Card& c) override {
-        assert(handCard.size() <= MAX_HAND_SIZE);
+        assert(static_cast<int>(handCard.size()) <= MAX_HAND_SIZE);
         handCard.push_back(c);
         sort(handCard.begin(), handCard.end());
     }
@@ -226,7 +226,7 @@ public:
     }
 
     virtual void add_and_discard(const Card& upcard) override {
-        assert(handCard.size() >= 1);
+        assert(static_cast<int>(handCard.size()) >= 1);
         add_card(upcard);
         print_hand();
         cout << "Discard upcard: [-1]\n";
@@ -238,7 +238,7 @@ public:
     }
 
     virtual Card lead_card(Suit trump) override {
-        assert(handCard.size() >= 1);
+        assert(static_cast<int>(handCard.size()) >= 1);
         print_hand();
         cout << "Human player " << name << ", please select a card:\n";
         int decision;
@@ -248,7 +248,7 @@ public:
     }
 
     virtual Card play_card(const Card& led_card, Suit trump) override {
-        assert(handCard.size() >= 1);
+        assert(static_cast<int>(handCard.size()) >= 1);
         print_hand();
         cout << "Human player " << name << ", please select a card:\n";
         int decision;
