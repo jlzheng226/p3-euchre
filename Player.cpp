@@ -203,7 +203,7 @@ public:
     virtual void add_card(const Card& c) override {
         assert(handCard.size() <= MAX_HAND_SIZE);
         handCard.push_back(c);
-        std::sort(handCard.begin(), handCard.end());
+        sort(handCard.begin(), handCard.end());
     }
 
     virtual bool make_trump(const Card& upcard, bool is_dealer,
