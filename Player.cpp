@@ -203,13 +203,13 @@ public:
     virtual void add_card(const Card& c) override {
         assert(handCard.size() <= MAX_HAND_SIZE);
         handCard.push_back(c);
+        std::sort(handCard.begin(), handCard.end());
     }
 
     virtual bool make_trump(const Card& upcard, bool is_dealer,
         int round, Suit& order_up_suit) const override {
         assert(round == 1 || round == 2);
         // print the player's hand card
-        std::sort(handCard.begin(), handCard.end());
         print_hand();
         cout << "Human player " << name << ", please enter a suit, or \"pass\":\n";
 
@@ -217,7 +217,7 @@ public:
         string decision;
         cin >> decision;
         if (decision != "pass") {
-            Suit ordered_up = string_to_suit(decision);
+            order_up_suit = string_to_suit(decision);
             return true;
         }
         else {
@@ -228,7 +228,6 @@ public:
     virtual void add_and_discard(const Card& upcard) override {
         assert(handCard.size() >= 1);
         add_card(upcard);
-        std::sort(handCard.begin(), handCard.end());
         print_hand();
         cout << "Discard upcard: [-1]\n";
         cout << "Human player " << name << ", please select a card to discard:\n";
@@ -240,7 +239,6 @@ public:
 
     virtual Card lead_card(Suit trump) override {
         assert(handCard.size() >= 1);
-        std::sort(handCard.begin(), handCard.end());
         print_hand();
         cout << "Human player " << name << ", please select a card:\n";
         int decision;
@@ -251,7 +249,6 @@ public:
 
     virtual Card play_card(const Card& led_card, Suit trump) override {
         assert(handCard.size() >= 1);
-        std::sort(handCard.begin(), handCard.end());
         print_hand();
         cout << "Human player " << name << ", please select a card:\n";
         int decision;
