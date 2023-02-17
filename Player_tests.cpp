@@ -4,7 +4,7 @@
 #include "Card.h"
 #include "unit_test_framework.h"
 
-
+#include <iostream>
 
 using namespace std;
 
@@ -15,9 +15,8 @@ TEST(test_player_get_name) {
     delete alice;
 }
 
-
-TEST(test_player_make_trump){
-    Player * alice = Player_factory("Alice", "Simple");
+TEST(test_make_trump){
+    Player* alice = Player_factory("Alice", "Simple");
     Player* bob = Player_factory("Bob", "Simple");
     Player* Dan = Player_factory("Dan", "Simple");
     const int round_one = 1;
@@ -74,7 +73,7 @@ TEST(test_player_make_trump){
     delete Dan;
 }
 
-TEST(add_and_discard_lead_card){
+TEST(test_add_and_discard_lead_card){
     Player* alice = Player_factory("Alice", "Simple");
     Player* bob = Player_factory("Bob", "Simple");
 
@@ -132,7 +131,7 @@ TEST(add_and_discard_lead_card){
     delete bob;
 }
 
-TEST(play_cards){
+TEST(test_play_card){
     Player* alice = Player_factory("Alice", "Simple");
     Player* bob = Player_factory("Bob", "Simple");
     const Card nine_diamonds = Card(NINE, DIAMONDS);
@@ -171,7 +170,7 @@ TEST(play_cards){
     ASSERT_EQUAL(play_card, king_clubs);
     delete alice;
 
-    //follow the suit, whcih is spades
+    //follow the suit, which is spades
     play_card = (*bob).play_card(led_card_b, trump);
     ASSERT_EQUAL(play_card, ten_spades);
     //does not have spades, so play the lowest card
@@ -187,5 +186,32 @@ TEST(play_cards){
     
 }
 
+TEST(test_lead_card) {
+    Player* alice = Player_factory("Alice", "Simple");
+    const Card ace_hearts = Card(ACE, HEARTS);
+    const Card king_hearts = Card(KING, HEARTS);
+    const Card jack_spades = Card(JACK, SPADES);
+    const Card ten_spades = Card(TEN, SPADES);
+    const Card nine_spades = Card(NINE, SPADES);
+    Suit trump = HEARTS;
+
+    alice->add_card(jack_spades);
+    alice->add_card(nine_spades);
+    alice->add_card(ten_spades);
+    alice->add_card(ace_hearts);
+    alice->add_card(king_hearts);
+
+    Card play_card = alice->lead_card(trump);
+    ASSERT_EQUAL(play_card, jack_spades);
+    play_card = alice->play_card(Card(KING, CLUBS), trump);
+    ASSERT_EQUAL(play_card, nine_spades);
+    play_card = alice->play_card(Card(TEN, DIAMONDS), trump);
+    ASSERT_EQUAL(play_card, ten_spades);
+    play_card = alice->play_card(Card(JACK, HEARTS), trump);
+    ASSERT_EQUAL(play_card, ace_hearts);
+    play_card = alice->play_card(Card(QUEEN, HEARTS), trump);
+    ASSERT_EQUAL(play_card, king_hearts);
+
+}
 
 TEST_MAIN()

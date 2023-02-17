@@ -182,8 +182,8 @@ class Game {
             // announce the hand, starting at zero, 
             // followed by the dealer and the upcard.
             cout << "Hand " << hand << endl;
-            cout << dealer << " deals" << endl;
-            cout << upcard << "turned up";
+            cout << dealer->get_name() << " deals" << endl;
+            cout << upcard << " turned up" << endl;
 
             bool order_up = false;
             Player * currPlayer;
@@ -211,11 +211,11 @@ class Game {
                         // record the player who ordered up the trump
                         ordered_player = (dealerNum + make_trump_hand) % 4;
                         cout << currPlayer->get_name() << " orders up " << trump << endl;
+                        cout << endl;
                     }
                     // increment the hand for making trump
                     make_trump_hand++;
                 }
-                cout << endl;
                 // reset the hand for making trump
                 make_trump_hand = 1;
             }

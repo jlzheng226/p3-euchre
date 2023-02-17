@@ -22,6 +22,7 @@ public:
     virtual void add_card(const Card& c) override {
         assert(static_cast<int>(handCard.size()) <= MAX_HAND_SIZE);
         handCard.push_back(c);
+        sort(handCard.begin(), handCard.end());
     }
 
     virtual bool make_trump(const Card& upcard, bool is_dealer,
