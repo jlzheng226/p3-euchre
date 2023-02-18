@@ -222,12 +222,14 @@ class Game {
         // EFFECTS: keep updating the point for each team
         void pointKeeper() {
             Team winnerTeam;
+            Team loseTeam;
             // if team 1 ordered the trump
             if (ordered_player == 0 || ordered_player == 2) {
                 // Team 1 get 1 point for taking 3 or 4 tricks
                 if (team1.getTricksWon() == 3 || team1.getTricksWon() == 4) {
                     team1.addPoint(1);
                     winnerTeam = team1;
+                    loseTeam = team2;
                     cout << team1.getPlayer1() << " and " << team1.getPlayer2()
                          << " win the hand" << endl;
                 }
@@ -236,6 +238,7 @@ class Game {
                 else if (team1.getTricksWon() == 5) {
                     team1.addPoint(2);
                     winnerTeam = team1;
+                    loseTeam = team2;
                     cout << team1.getPlayer1() << " and " << team1.getPlayer2()
                          << " win the hand" << endl;
                     cout << "march!" << endl;
@@ -245,9 +248,10 @@ class Game {
                 if (team2.getTricksWon() >= 3) {
                     team2.addPoint(2);
                     winnerTeam = team2;
+                    loseTeam = team1;
                     cout << team2.getPlayer1() << " and " << team2.getPlayer2()
                          << " win the hand" << endl;
-                    cout << "euchred!";
+                    cout << "euchred!" << endl;
                 }
             }
             // if team 2 ordered the trump
@@ -256,6 +260,7 @@ class Game {
                 if (team2.getTricksWon() == 3 || team2.getTricksWon() == 4) {
                     team2.addPoint(1);
                     winnerTeam = team2;
+                    loseTeam = team1;
                     cout << team2.getPlayer1() << " and " << team2.getPlayer2()
                          << " win the hand" << endl;
                 }
@@ -264,6 +269,7 @@ class Game {
                 else if (team2.getTricksWon() == 5) {
                     team2.addPoint(2);
                     winnerTeam = team2;
+                    loseTeam = team1;
                     cout << team2.getPlayer1() << " and " << team2.getPlayer2()
                          << " win the hand" << endl;
                     cout << "march!" << endl;
@@ -273,14 +279,16 @@ class Game {
                 if (team1.getTricksWon() >= 3) {
                     team1.addPoint(2);
                     winnerTeam = team1;
+                    loseTeam = team2;
                     cout << team1.getPlayer1() << " and " << team1.getPlayer2()
                          << " win the hand" << endl;
-                    cout << "euchred!";
+                    cout << "euchred!" << endl;
                 }
             }
 
             // print the score, followed by an extra newline
             winnerTeam.printScore();
+            loseTeam.printScore();
             cout << endl;
         }
 
@@ -291,24 +299,26 @@ class Game {
             int lead_player_num = (dealerNum + 1) % 4;
             Player * leadPlayer = players[lead_player_num];
             int trick = 1;
+            int highest_player_index = 0;
 
             while (trick <= 5) {
                 Card highestCard = leadPlayer->lead_card(trump);
                 Card leadCard = highestCard;
-                int highest_player_index = 0;
 
                 // print the lead card and lead player
                 cout << leadCard << " led by " << leadPlayer->get_name() << endl;
-                for (int play_round = 1; play_round <= 3; play_round++) {
-                    Card playCard = players[play_round]->play_card(leadCard, trump);
+                for (int player_index = lead_player_num + 1; 
+                         player_index <= lead_player_num + 3; player_index++) {
+                    Card playCard = players[player_index % 4]->play_card
+                                                                (leadCard, trump);
                     // print each trick
                     cout << playCard << " played by " 
-                         << players[play_round]->get_name() 
+                         << players[player_index % 4]->get_name() 
                          << endl;
 
                     if (Card_less(highestCard, playCard, leadCard, trump)) {
                         highestCard = playCard;
-                        highest_player_index = play_round;
+                        highest_player_index = player_index % 4;
                     }
                 }
                 // print the winner for the current trick
@@ -330,7 +340,7 @@ class Game {
                 // increment trick for use of next trick
                 trick++;
                 // update lead player for next trick
-                lead_player_num = (lead_player_num + 1) % 4;
+                lead_player_num = highest_player_index;
                 leadPlayer = players[lead_player_num];
             }
             // update points
