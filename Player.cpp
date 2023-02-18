@@ -2,6 +2,7 @@
 
 #include "Player.h"
 #include <iostream>
+#include <cassert>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -10,9 +11,6 @@ using namespace std;
 
 class SimplePlayer : public Player {
 public:
-    SimplePlayer() {
-        name = "";
-    }
     SimplePlayer(string name_in) {
         name = name_in;
     }
@@ -192,9 +190,6 @@ private:
 
 class HumanPlayer : public Player {
 public:
-    HumanPlayer() {
-        name = "";
-    }
     HumanPlayer(string name_in) {
         name = name_in;
     }
@@ -247,8 +242,9 @@ public:
         cout << "Human player " << name << ", please select a card:\n";
         int decision;
         cin >> decision;
-
-        return handCard[decision];
+        Card played = handCard[decision];
+        handCard.erase(handCard.begin() + decision);
+        return played;
     }
 
     virtual Card play_card(const Card& led_card, Suit trump) override {
@@ -257,8 +253,9 @@ public:
         cout << "Human player " << name << ", please select a card:\n";
         int decision;
         cin >> decision;
-
-        return handCard[decision];
+        Card played = handCard[decision];
+        handCard.erase(handCard.begin() + decision);
+        return played;
     }
 
 private:

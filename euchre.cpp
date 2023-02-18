@@ -88,19 +88,19 @@ class Game {
             // if points for each team are all smaller thant
             // point to win, then keep playing next hand
             play_hand();
-            // update hand
-            hand++;
         }
 
         bool gameOver() {
             bool is_game_over = false;
             // when the game is over, print the winnners of the game
             if (team1.getScore() > points_to_win) {
-                cout << team1.getPlayer1() << " and " << team1.getPlayer2() << " win!" << endl;
+                cout << team1.getPlayer1() << " and " 
+                     << team1.getPlayer2() << " win!" << endl;
                 is_game_over = true;
             }
             else if(team2.getScore() > points_to_win) {
-                cout << team2.getPlayer1() << " and " << team2.getPlayer2() << " win!" << endl;
+                cout << team2.getPlayer1() << " and " 
+                     << team2.getPlayer2() << " win!" << endl;
                 is_game_over = true;
             }
             
@@ -110,6 +110,7 @@ class Game {
                     delete players[i];
                 }
             }
+            pack.reset();
             return is_game_over;
         }
     
@@ -208,7 +209,8 @@ class Game {
                     else {
                         // record the player who ordered up the trump
                         ordered_player = (dealerNum + make_trump_hand) % 4;
-                        cout << currPlayer->get_name() << " orders up " << trump << endl;
+                        cout << currPlayer->get_name() 
+                             << " orders up " << trump << endl;
                         cout << endl;
                     }
                     // increment the hand for making trump
@@ -217,6 +219,7 @@ class Game {
                 // reset the hand for making trump
                 make_trump_hand = 1;
             }
+            hand++;
         }
 
         // EFFECTS: keep updating the point for each team
@@ -392,6 +395,12 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    // print the arugments
+    for (int i = 0; i < argc; i++) {
+        cout << argv[i] << " ";
+    }
+    cout << endl;
+
     // get shuffle decision
     string shuffle = argv[2];
     // get points for winning
@@ -399,10 +408,10 @@ int main(int argc, char **argv) {
     // get card pack
     Pack pack(fin);
     // get game players
-    vector<Player*> players = {Player_factory(string(argv[4]), string(argv[5])),
-                               Player_factory(string(argv[6]), string(argv[7])),
-                               Player_factory(string(argv[8]), string(argv[9])),
-                               Player_factory(string(argv[10]), string(argv[11]))};
+    vector<Player*> players;
+    for (int i = 4; i < 12; i+=2) {
+        players.push_back(Player_factory(string(argv[i]), string(argv[i + 1])));
+    }
 
     Game game(pack, shuffle, winning_point, players);
     while (!game.gameOver()) {
