@@ -170,10 +170,8 @@ class Game {
 
             // get the upcard
             upcard = pack.deal_one();
-            cout << upcard << " turned up" << endl;
             // initialize the trump suit to be the suit of upcard
             trump = upcard.get_suit();
-
         }
 
         // EFFECTS: making trump

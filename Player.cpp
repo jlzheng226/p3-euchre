@@ -111,7 +111,8 @@ public:
                 for (size_t remain_index = index + 1; 
                      remain_index < handCard.size(); 
                      remain_index++) {
-                    if (handCard[remain_index] > largestCard) {
+                    if (handCard[remain_index].is_trump(trump) == false
+                        && handCard[remain_index] > largestCard) {
                         // update the largest non-trump card
                         largestCard = handCard[remain_index];
                         // update the index of the largest card
@@ -154,7 +155,8 @@ public:
                 for (size_t remain_index = index + 1; 
                      remain_index < handCard.size();
                      remain_index++) {
-                    if (Card_less(largestSuitCard, handCard[remain_index], 
+                    if (handCard[remain_index].get_suit(trump) == ledSuit &&
+                        Card_less(largestSuitCard, handCard[remain_index], 
                         led_card, trump)) {
                         // update largest follow suit card
                         largestSuitCard = handCard[remain_index];
@@ -240,6 +242,7 @@ public:
 
     virtual Card lead_card(Suit trump) override {
         assert(static_cast<int>(handCard.size()) >= 1);
+
         print_hand();
         cout << "Human player " << name << ", please select a card:\n";
         int decision;
