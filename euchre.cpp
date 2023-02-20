@@ -85,20 +85,20 @@ class Game {
             deal();
             // make trump card
             make_trump();
-            // if points for each team are all smaller thant
-            // point to win, then keep playing next hand
+            // play the game
             play_hand();
+            hand++;
         }
 
         bool gameOver() {
             bool is_game_over = false;
             // when the game is over, print the winnners of the game
-            if (team1.getScore() > points_to_win) {
+            if (team1.getScore() >= points_to_win) {
                 cout << team1.getPlayer1() << " and " 
                      << team1.getPlayer2() << " win!" << endl;
                 is_game_over = true;
             }
-            else if(team2.getScore() > points_to_win) {
+            else if(team2.getScore() >= points_to_win) {
                 cout << team2.getPlayer1() << " and " 
                      << team2.getPlayer2() << " win!" << endl;
                 is_game_over = true;
@@ -110,6 +110,8 @@ class Game {
                     delete players[i];
                 }
             }
+            dealerNum++;
+            dealer = players[(dealerNum) % 4];
             pack.reset();
             return is_game_over;
         }
@@ -122,11 +124,11 @@ class Game {
         int hand;
         int dealerNum;
         string dealer_name;
+        Player* dealer;
         Card upcard;
         int round;
         Suit trump;
         int make_trump_hand;
-        Player* dealer;
         int ordered_player;
         Team team1;
         Team team2;
@@ -134,7 +136,7 @@ class Game {
         // EFFECTS: if player choose to shuffle cards
         //          then do it
         void shuffle() {
-            if (shuffle_Dec == "Shuffle") {
+            if (shuffle_Dec == "shuffle") {
                 pack.shuffle();
             }
         }
@@ -189,7 +191,6 @@ class Game {
             bool is_dealer = false;
             // record the hand when making trump in each round
             int make_trump_hand = 1;
-            // record the player who ordered up the trump
             
             for (round = 1; round <= 2; round++) {
                 while ((!order_up) && make_trump_hand <= 4) {
@@ -209,6 +210,9 @@ class Game {
                     else {
                         // record the player who ordered up the trump
                         ordered_player = (dealerNum + make_trump_hand) % 4;
+                        if (round == 1) {
+                            dealer->add_and_discard(upcard);
+                        }
                         cout << currPlayer->get_name() 
                              << " orders up " << trump << endl;
                         cout << endl;
@@ -219,20 +223,17 @@ class Game {
                 // reset the hand for making trump
                 make_trump_hand = 1;
             }
-            hand++;
         }
 
         // EFFECTS: keep updating the point for each team
         void pointKeeper() {
-            Team winnerTeam;
-            Team loseTeam;
+            Team winnerTeam, loseTeam;
             // if team 1 ordered the trump
             if (ordered_player == 0 || ordered_player == 2) {
                 // Team 1 get 1 point for taking 3 or 4 tricks
                 if (team1.getTricksWon() == 3 || team1.getTricksWon() == 4) {
                     team1.addPoint(1);
-                    winnerTeam = team1;
-                    loseTeam = team2;
+                    winnerTeam = team1, loseTeam = team2;
                     cout << team1.getPlayer1() << " and " << team1.getPlayer2()
                          << " win the hand" << endl;
                 }
@@ -240,8 +241,7 @@ class Game {
                 // Taking all 5 tricks is called a march
                 else if (team1.getTricksWon() == 5) {
                     team1.addPoint(2);
-                    winnerTeam = team1;
-                    loseTeam = team2;
+                    winnerTeam = team1, loseTeam = team2;
                     cout << team1.getPlayer1() << " and " << team1.getPlayer2()
                          << " win the hand" << endl;
                     cout << "march!" << endl;
@@ -250,8 +250,7 @@ class Game {
                 // This is called euchred
                 if (team2.getTricksWon() >= 3) {
                     team2.addPoint(2);
-                    winnerTeam = team2;
-                    loseTeam = team1;
+                    winnerTeam = team2, loseTeam = team1;
                     cout << team2.getPlayer1() << " and " << team2.getPlayer2()
                          << " win the hand" << endl;
                     cout << "euchred!" << endl;
@@ -262,8 +261,7 @@ class Game {
                 // Team 2 get 1 point for taking 3 or 4 tricks
                 if (team2.getTricksWon() == 3 || team2.getTricksWon() == 4) {
                     team2.addPoint(1);
-                    winnerTeam = team2;
-                    loseTeam = team1;
+                    winnerTeam = team2, loseTeam = team1;
                     cout << team2.getPlayer1() << " and " << team2.getPlayer2()
                          << " win the hand" << endl;
                 }
@@ -271,8 +269,7 @@ class Game {
                 // Taking all 5 tricks is called a march
                 else if (team2.getTricksWon() == 5) {
                     team2.addPoint(2);
-                    winnerTeam = team2;
-                    loseTeam = team1;
+                    winnerTeam = team2, loseTeam = team1;
                     cout << team2.getPlayer1() << " and " << team2.getPlayer2()
                          << " win the hand" << endl;
                     cout << "march!" << endl;
@@ -281,8 +278,7 @@ class Game {
                 // This is called euchred
                 if (team1.getTricksWon() >= 3) {
                     team1.addPoint(2);
-                    winnerTeam = team1;
-                    loseTeam = team2;
+                    winnerTeam = team1, loseTeam = team2;
                     cout << team1.getPlayer1() << " and " << team1.getPlayer2()
                          << " win the hand" << endl;
                     cout << "euchred!" << endl;
