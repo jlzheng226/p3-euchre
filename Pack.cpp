@@ -33,6 +33,7 @@ void Pack::reset() {
 }
 
 void Pack::shuffle() {
+	next = 0;
 	int half_pack = 12;
 	std::array<Card, PACK_SIZE> shuffled_pack;
 	for (int shuffle_times = 0; shuffle_times < 7; shuffle_times++) {
