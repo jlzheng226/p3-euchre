@@ -18,7 +18,7 @@ public:
         return name;
     }
     virtual void add_card(const Card& c) override {
-        assert(static_cast<int>(handCard.size()) <= MAX_HAND_SIZE);
+        assert(static_cast<int>(handCard.size()) < MAX_HAND_SIZE);
         handCard.push_back(c);
         sort(handCard.begin(), handCard.end());
     }
@@ -82,7 +82,7 @@ public:
 
     virtual void add_and_discard(const Card& upcard) override {
         assert(static_cast<int>(handCard.size()) >= 1);
-        add_card(upcard);
+        handCard.push_back(upcard);
         Suit trump = upcard.get_suit();
         Card lowest = handCard[0];
         int lowest_index = 0;
@@ -94,6 +94,7 @@ public:
             }
         }
         handCard.erase(handCard.begin() + lowest_index);
+        cout << endl;
     }
 
     virtual Card lead_card(Suit trump) override {
@@ -199,7 +200,7 @@ public:
     }
 
     virtual void add_card(const Card& c) override {
-        assert(static_cast<int>(handCard.size()) <= MAX_HAND_SIZE);
+        assert(static_cast<int>(handCard.size()) < MAX_HAND_SIZE);
         handCard.push_back(c);
         sort(handCard.begin(), handCard.end());
     }
@@ -225,14 +226,19 @@ public:
 
     virtual void add_and_discard(const Card& upcard) override {
         assert(static_cast<int>(handCard.size()) >= 1);
-        add_card(upcard);
         print_hand();
         cout << "Discard upcard: [-1]\n";
-        cout << "Human player " << name << ", please select a card to discard:\n";
+        cout << "Human player " << name << ", please select a card to discard:\n" << endl;
 
         int decision;
         cin >> decision;
+        if (decision == -1) {
+            cout << endl;
+            return;
+        }
         handCard.erase(handCard.begin() + decision);
+        handCard.push_back(upcard);
+        sort(handCard.begin(), handCard.end());
     }
 
     virtual Card lead_card(Suit trump) override {
