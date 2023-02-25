@@ -5,8 +5,8 @@
 Pack::Pack() {
 	next = 0;
 	const int number_per_suit = 6;
-	for (int suit = SPADES; suit <= DIAMONDS; suit ++) {
-		for (int rank = 7; rank <= 12; rank ++) {
+	for (int suit = SPADES; suit <= DIAMONDS; suit++) {
+		for (int rank = 7; rank <= 12; rank++) {
 			cards[suit * number_per_suit + rank - 7] = Card(static_cast<Rank>(rank), 
 														static_cast<Suit>(suit));
 		}
@@ -52,6 +52,7 @@ bool Pack::empty() const {
 	if (next == PACK_SIZE) {
 		return true;
 	}
-	return false;
+	else {
+		return false;
+	}
 }
-
