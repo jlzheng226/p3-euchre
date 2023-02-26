@@ -26,7 +26,7 @@ public:
     virtual bool make_trump(const Card& upcard, bool is_dealer,
         int round, Suit& order_up_suit) const override {
         assert(round == 1 || round == 2);
-        
+
         Suit upcard_suit = upcard.get_suit();
         // round 1
         if (round == 1) {
@@ -107,9 +107,9 @@ public:
             if (handCard[index].is_trump(trump) == false) {
                 largestCard = handCard[index];
                 largest_index = index;
-                for (size_t remain_index = index + 1; 
-                     remain_index < handCard.size(); 
-                     remain_index++) {
+                for (size_t remain_index = index + 1;
+                    remain_index < handCard.size();
+                    remain_index++) {
                     if (handCard[remain_index].is_trump(trump) == false
                         && handCard[remain_index] > largestCard) {
                         // update the largest non-trump card
@@ -151,12 +151,12 @@ public:
                 largestSuitCard = handCard[index];
                 largestSuit_index = index;
                 // find the highest card that follows suit
-                for (size_t remain_index = index + 1; 
-                     remain_index < handCard.size();
-                     remain_index++) {
+                for (size_t remain_index = index + 1;
+                    remain_index < handCard.size();
+                    remain_index++) {
                     if (handCard[remain_index].get_suit(trump) == ledSuit &&
-                        Card_less(largestSuitCard, handCard[remain_index], 
-                        led_card, trump)) {
+                        Card_less(largestSuitCard, handCard[remain_index],
+                            led_card, trump)) {
                         // update largest follow suit card
                         largestSuitCard = handCard[remain_index];
                         // update the largest follow suit index
@@ -165,7 +165,7 @@ public:
                 }
                 handCard.erase(handCard.begin() + largestSuit_index);
                 return largestSuitCard;
-            } 
+            }
         }
 
         // if the player does not have cards that follow suit,
@@ -228,12 +228,11 @@ public:
         assert(static_cast<int>(handCard.size()) >= 1);
         print_hand();
         cout << "Discard upcard: [-1]\n";
-        cout << "Human player " << name << ", please select a card to discard:\n" << endl;
+        cout << "Human player " << name << ", please select a card to discard:\n";
 
         int decision;
         cin >> decision;
         if (decision == -1) {
-            cout << endl;
             return;
         }
         handCard.erase(handCard.begin() + decision);
@@ -271,9 +270,9 @@ private:
     void print_hand() const {
         for (size_t i = 0; i < handCard.size(); ++i) {
             cout << "Human player " << name << "'s hand: "
-            << "[" << i << "] " << handCard[i] << "\n";
+                << "[" << i << "] " << handCard[i] << "\n";
+        }
     }
-}
 
 };
 
