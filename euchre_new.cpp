@@ -25,6 +25,7 @@ public:
         deal();
         make_trump();
         play_hand();
+        add_tricks();
         hands++;
     }
 
@@ -43,15 +44,21 @@ public:
 private:
     vector<Player*> euchre_players;
     string shuffle_dec;
-    int points_to_win;
     Pack pack;
+    //keep track of hands
     int hands = 0;
+    //an array to track how many tricks each player wins in a hand
     int tricks_per_player[4] = { 0,0,0,0 };
+    //track dealer index
     int dealer_index = 0;
+    //track the index of the player who orders up
     int order_index;
+    //track the points earned by T1 and T2
     int points_t1 = 0;
     int points_t2 = 0;
+    //track upcard in each hand
     Card upcard;
+    //get trump
     Suit trump;
 
     void shuffle() {
@@ -103,19 +110,24 @@ private:
         for (int round = 1; round < 3; round++) {
             for (int player_num = 1; player_num < 5; player_num++) {
                 is_dealer = (((dealer_index + player_num) % 4) == dealer_index);
-                make_trump = (*euchre_players[(dealer_index + player_num) % 4]).make_trump(upcard, is_dealer, round, trump);
+                make_trump = (*euchre_players[(dealer_index + player_num) % 4]).
+                    make_trump(upcard, is_dealer, round, trump);
+                //situation 1: someone makes trump in round 1
                 if (make_trump == true && round == 1) {
                     cout << (*euchre_players[(dealer_index + player_num) % 4]).get_name()
                         << " orders up " << trump << endl;
                     (*euchre_players[dealer_index]).add_and_discard(upcard);
                     cout << endl;
-                    order_index = (dealer_index + player_num) % 4; //this is the player that orders up
+                    //this is the player that orders up
+                    order_index = (dealer_index + player_num) % 4;
                     return;
                 }
+                //situation 2: player doesn't make trump
                 else if (make_trump == false) {
                     cout << (*euchre_players[(dealer_index + player_num) % 4]).get_name()
                         << " passes" << endl;
                 }
+                //situation 3: someone makes trump in round 2
                 else if (make_trump == true && round == 2) {
                     cout << (*euchre_players[(dealer_index + player_num) % 4]).get_name()
                         << " orders up " << trump << endl;
@@ -124,40 +136,56 @@ private:
                     return;
                 }
             }
-
         }
     }
 
     void play_hand() {
+        //the index of the player to lead card
         int lead_index = (dealer_index + 1) % 4;
+        //first set biggest card index to equal lead_index, changed later
         int biggest_index = lead_index;
+        //current player index
         int current_index;
+        //the card lead by the player
         Card lead_card;
+        //biggest card in the trick
         Card biggest_card;
+        //cards played by other players
         Card follow_card;
 
+        //there are five tricks in one hand
         for (int trick = 1; trick < 6; trick++) {
             lead_card = (*euchre_players[lead_index]).lead_card(trump);
             biggest_card = lead_card;
-            cout << lead_card << " led by " << (*euchre_players[lead_index]).get_name() << endl;
+            cout << lead_card << " led by " << (*euchre_players[lead_index]).get_name()
+                << endl;
+            //players take turns to play cards
             for (int player = 1; player < 4; player++) {
                 current_index = (lead_index + player) % 4;
-                follow_card = (*euchre_players[current_index]).play_card(lead_card, trump);
-                cout << follow_card << " played by " << (*euchre_players[current_index]).get_name() << endl;
+                follow_card = (*euchre_players[current_index]).play_card(
+                    lead_card, trump);
+                cout << follow_card << " played by " << (*euchre_players[current_index]).
+                    get_name() << endl;
+                //update the card with the biggest value
                 if (Card_less(biggest_card, follow_card, lead_card, trump)) {
                     biggest_card = follow_card;
                     biggest_index = current_index;
                 }
             }
-            
-            cout << (*euchre_players[biggest_index]).get_name() << " takes the trick" << endl << endl;
+
+            cout << (*euchre_players[biggest_index]).get_name() << " takes the trick"
+                << endl << endl;
+            //add one to the player who wins the trick
             tricks_per_player[biggest_index] ++;
+            //set the lead_player in next round to be the biggest index
             lead_index = biggest_index;
         }
-        //team 1 wins the trick
+    }
+
+    void add_tricks() {
         if ((tricks_per_player[0] + tricks_per_player[2]) >= 3) {
-            cout << (*euchre_players[0]).get_name() << " and " << (*euchre_players[2]).get_name()
-                << " win the hand" << endl;
+            cout << (*euchre_players[0]).get_name() << " and " << (*euchre_players[2]).
+                get_name() << " win the hand" << endl;
             //team 1 orders up
             if (order_index == 0 || order_index == 2) {
                 //team 1 takes five tricks
@@ -177,8 +205,8 @@ private:
             }
         }
         else {
-            cout << (*euchre_players[1]).get_name() << " and " << (*euchre_players[3]).get_name()
-                << " win the hand" << endl;
+            cout << (*euchre_players[1]).get_name() << " and " << (*euchre_players[3]).
+                get_name() << " win the hand" << endl;
             //team 2 orders up
             if (order_index == 1 || order_index == 3) {
                 //team 2 takes five tricks
@@ -197,17 +225,17 @@ private:
                 points_t2 += 2;
             }
         }
-
-        cout << (*euchre_players[0]).get_name() << " and " << (*euchre_players[2]).get_name()
-            << " have " << points_t1 << " points" << endl;
-        cout << (*euchre_players[1]).get_name() << " and " << (*euchre_players[3]).get_name()
-            << " have " << points_t2 << " points" << endl << endl;
-
         for (int i = 0; i < 4; i++) {
             tricks_per_player[i] = 0;
         }
+
+        cout << (*euchre_players[0]).get_name() << " and " << (*euchre_players[2]).
+            get_name() << " have " << points_t1 << " points" << endl;
+        cout << (*euchre_players[1]).get_name() << " and " << (*euchre_players[3]).
+            get_name() << " have " << points_t2 << " points" << endl << endl;
     }
 };
+
 
 
     // EFFECTS: check the errors of the input arguments
@@ -233,7 +261,6 @@ private:
                 return false;
             }
         }
-
         return true;
     }
 
@@ -274,18 +301,30 @@ private:
         }
 
         Game newGame = Game(players, pack, shuffle);
+        //keep run the game while neither of the teams have enough points
         while ((newGame.get_points_team1() < winning_point) &&
             (newGame.get_points_team2() < winning_point)) {
             newGame.play();
         }
 
+        //team 1 wins
         if (newGame.get_points_team1() >= winning_point) {
             cout << newGame.get_player(0) << " and " << newGame.get_player(2)
                 << " win!" << endl;
         }
+        //team 2 wins
         else {
             cout << newGame.get_player(1) << " and " << newGame.get_player(3)
                 << " win!" << endl;
         }
         return 0;
     }
+
+
+
+
+
+
+
+
+
