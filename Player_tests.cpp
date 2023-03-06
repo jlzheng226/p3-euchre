@@ -212,6 +212,8 @@ TEST(test_lead_card) {
     play_card = alice->play_card(Card(QUEEN, HEARTS), trump);
     ASSERT_EQUAL(play_card, king_hearts);
 
+    delete alice;
 }
+
 
 TEST_MAIN()
